@@ -1,19 +1,16 @@
-# Laravel ignores
 /vendor
 /node_modules
-/storage
 /.git
-
-# Ignore system files
-.DS_Store
+/.idea
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
 npm-debug.log
 yarn-error.log
-
-# Keep Vite config files (don't ignore!)
-!/vite.config.js
-!/postcss.config.js
-!/tailwind.config.js
-
-# Env
-.env
-.env.*
