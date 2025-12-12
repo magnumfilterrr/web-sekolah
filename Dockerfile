@@ -11,8 +11,12 @@ COPY package.json package-lock.json ./
 # Install node dependencies
 RUN npm install
 
-# Copy necessary frontend and config files
+# Copy ALL required frontend config
 COPY vite.config.js ./
+COPY postcss.config.js ./
+COPY tailwind.config.js ./
+
+# Copy Laravel sources (yang dibutuhkan oleh Vite)
 COPY resources ./resources
 COPY public ./public
 
@@ -38,7 +42,6 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libpq-dev
 
-# Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
@@ -56,42 +59,39 @@ RUN docker-php-ext-install \
 # Copy Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
 WORKDIR /var/www/html
 
 # Copy composer files
 COPY composer.json composer.lock ./
 
 # Install PHP dependencies
-RUN composer install --optimize-autoloader --no-dev --no-scripts || \
-    composer install --optimize-autoloader --no-dev --no-scripts --ignore-platform-reqs
+RUN composer install --no-dev --optimize-autoloader --no-scripts || \
+    composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
 
-# Copy the application source
+# Copy the full backend application
 COPY . /var/www/html
 
-# Copy Vite build from previous stage
+# Copy Vite build output
 COPY --from=vite-builder /app/public/build ./public/build
 
-# Composer autoload optimize
+# Optimize autoload
 RUN composer dump-autoload --optimize
 
-# Set permissions
+# Fix permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
 
-# Enable Apache mod_rewrite
+# Enable mod_rewrite
 RUN a2enmod rewrite
 
-# Configure Apache DocumentRoot
+# Set Apache DocumentRoot
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Expose port for Render
 EXPOSE 10000
 
-# Start Apache + Laravel optimizations
 CMD sed -i "s/80/10000/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf && \
     php artisan config:cache && \
     php artisan route:cache && \
