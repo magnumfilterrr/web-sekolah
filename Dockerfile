@@ -1,31 +1,26 @@
 # =============================
-# 1. FRONTEND BUILD (Vite + Tailwind)
+# 1. FRONTEND BUILD (Vite)
 # =============================
 FROM node:20 AS vite-builder
 
 WORKDIR /app
 
-# Copy package files first
+# Copy package files
 COPY package.json package-lock.json ./
 
+# Install node dependencies
 RUN npm install
 
-# Copy config files required for build
+# Copy required frontend files
 COPY vite.config.js ./
 COPY postcss.config.js ./
 COPY tailwind.config.js ./
 
-# Copy source code
 COPY resources ./resources
 COPY public ./public
 
 # Build frontend assets
 RUN npm run build
-
-
-# =============================
-# 2. BACKEND BUILD (Laravel)
-# =============================
 FROM php:8.3-apache
 
 # Install system dependencies
