@@ -1,0 +1,19 @@
+# Laravel ignores
+/vendor
+/node_modules
+/storage
+/.git
+
+# Ignore system files
+.DS_Store
+npm-debug.log
+yarn-error.log
+
+# Keep Vite config files (don't ignore!)
+!/vite.config.js
+!/postcss.config.js
+!/tailwind.config.js
+
+# Env
+.env
+.env.*
