@@ -1,16 +1,40 @@
-/vendor
-/node_modules
+# ========================================
+# IGNORE INTERNAL PROJECT DIRECTORIES
+# ========================================
 /.git
 /.idea
+/.vscode
+/node_modules
+/vendor
+
+# ========================================
+# STORAGE — jangan hapus folder-nya,
+# hanya kosongkan isi tertentu!
+# ========================================
 /storage/logs/*
 /storage/framework/cache/*
 /storage/framework/sessions/*
 /storage/framework/views/*
+
+# ========================================
+# ENV & CONFIG PRIVATE
+# ========================================
 .env
-.env.backup
-.env.production
-.phpunit.result.cache
-Homestead.json
-Homestead.yaml
+.env.*
+!.env.example
+
+# ========================================
+# BUILD / ARTIFACTS / CACHE FILES
+# ========================================
 npm-debug.log
+yarn-debug.log
 yarn-error.log
+pnpm-debug.log
+.phpunit.result.cache
+
+# Homestead (tidak diperlukan)
+/Homestead.json
+/Homestead.yaml
+
+# MacOS junk
+.DS_Store
