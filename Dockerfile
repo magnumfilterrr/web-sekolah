@@ -23,6 +23,14 @@ COPY public ./public
 RUN npm run build
 FROM php:8.3-apache
 
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
+RUN echo '<Directory /var/www/html/>' \
+    'AllowOverride All' \
+    'Require all granted' \
+    '</Directory>' \
+    >> /etc/apache2/apache2.conf
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git curl unzip zip \
