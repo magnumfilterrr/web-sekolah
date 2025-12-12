@@ -1,4 +1,5 @@
 import "./bootstrap";
+
 // Import Alpine.js
 import Alpine from "alpinejs";
 window.Alpine = Alpine;
@@ -29,11 +30,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Inisialisasi GLightbox
     if (typeof GLightbox !== "undefined") {
         GLightbox({
-            selector: ".glightbox", // gunakan class ini di elemen <a> galeri
+            selector: ".glightbox",
         });
     }
 
-    // Inisialisasi Swiper (kalau belum di-handle langsung di Blade)
+    // Inisialisasi Swiper
     if (typeof Swiper !== "undefined") {
         new Swiper(".swiper-container", {
             loop: true,
@@ -46,7 +47,3 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
-
-import Alpine from "alpinejs";
-window.Alpine = Alpine;
-Alpine.start();
