@@ -1,98 +1,90 @@
 # =============================
-# 1. FRONTEND BUILD (Vite)
+# 1. FRONTEND BUILD (Vite + Tailwind)
 # =============================
 FROM node:20 AS vite-builder
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first
 COPY package.json package-lock.json ./
 
-# Install node dependencies
 RUN npm install
 
-# Copy necessary frontend and config files
+# Copy config files required for build
 COPY vite.config.js ./
+COPY postcss.config.js ./
+COPY tailwind.config.js ./
+
+# Copy source code
 COPY resources ./resources
 COPY public ./public
 
-# Build frontend (Vite)
+# Build frontend assets
 RUN npm run build
 
 
 # =============================
-# 2. BACKEND BUILD (Laravel + Apache)
+# 2. BACKEND BUILD (Laravel)
 # =============================
 FROM php:8.3-apache
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    libicu-dev \
-    zip \
-    unzip \
-    libpq-dev
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+    git curl unzip zip \
+    libpng-dev libonig-dev libxml2-dev \
+    libzip-dev libicu-dev libpq-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-install \
-    pdo_pgsql \
-    pgsql \
-    mbstring \
-    exif \
-    pcntl \
-    bcmath \
-    gd \
-    zip \
-    intl
+    pdo_pgsql pgsql mbstring exif pcntl \
+    bcmath gd zip intl
 
-# Copy Composer
+# Copy Composer binary
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy composer files
+# Copy only composer files first
 COPY composer.json composer.lock ./
 
-# Install PHP dependencies
+# Install backend dependencies
 RUN composer install --optimize-autoloader --no-dev --no-scripts || \
     composer install --optimize-autoloader --no-dev --no-scripts --ignore-platform-reqs
 
-# Copy the application source
-COPY . /var/www/html
+# Copy application source
+COPY . .
 
-# Copy Vite build from previous stage
+# Remove local node_modules accidentally copied
+RUN rm -rf node_modules
+
+# Copy Vite build output
 COPY --from=vite-builder /app/public/build ./public/build
 
-# Composer autoload optimize
+# Regenerate optimized autoload
 RUN composer dump-autoload --optimize
 
-# Set permissions
+# Set proper permissions
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+    && chmod -R 755 storage bootstrap/cache
 
-# Enable Apache mod_rewrite
+# Enable Apache Rewrite
 RUN a2enmod rewrite
 
-# Configure Apache DocumentRoot
+# Configure DocumentRoot
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Expose port for Render
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
+    /etc/apache2/sites-available/000-default.conf
+
+RUN sed -ri -e 's!Directory /var/www/!Directory ${APACHE_DOCUMENT_ROOT}!g' \
+    /etc/apache2/apache2.conf
+
+# Expose port (Render)
 EXPOSE 10000
 
-# Start Apache + Laravel optimizations
-CMD sed -i "s/80/10000/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf && \
+CMD sed -i "s/80/10000/g" /etc/apache2/ports.conf && \
     php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache && \
