@@ -43,39 +43,35 @@ RUN composer install --optimize-autoloader --no-dev --no-scripts \
 COPY . .
 RUN rm -rf node_modules
 
+# Copy Vite build output INCLUDING manifest
 COPY --from=vite-builder /app/public/build ./public/build
 
 RUN composer dump-autoload --optimize
 
-# Set DocumentRoot ke public SEBELUM set permissions
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
     /etc/apache2/sites-available/000-default.conf && \
     sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
     /etc/apache2/sites-available/default-ssl.conf 2>/dev/null || true
 
-# Konfigurasi Apache untuk Laravel
 RUN printf "\n<Directory ${APACHE_DOCUMENT_ROOT}>\n\
     Options Indexes FollowSymLinks\n\
     AllowOverride All\n\
     Require all granted\n\
 </Directory>\n" >> /etc/apache2/apache2.conf
 
-# Enable mod_rewrite
 RUN a2enmod rewrite
 
-# Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+    && chmod -R 755 /var/www/html/bootstrap/cache \
+    && chmod -R 755 /var/www/html/public
 
-# Change port configuration
 RUN sed -i "s/Listen 80/Listen 10000/g" /etc/apache2/ports.conf && \
     sed -i "s/:80/:10000/g" /etc/apache2/sites-available/000-default.conf
 
 EXPOSE 10000
 
-# Startup script
 CMD php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache && \
