@@ -2,7 +2,6 @@
 # 1. FRONTEND BUILD (Vite)
 # =============================
 FROM node:20 AS vite-builder
-
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -21,23 +20,20 @@ RUN npm run build
 # =============================
 FROM php:8.3-apache
 
-# Fix Apache server name warning
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+RUN echo "DirectoryIndex index.php index.html" >> /etc/apache2/apache2.conf
 
-# Add clean Directory rules
-RUN printf "\n<Directory /var/www/html/>\n\
+RUN printf "\n<Directory /var/www/html/public>\n\
     AllowOverride All\n\
     Require all granted\n\
 </Directory>\n" >> /etc/apache2/apache2.conf
 
-# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git curl unzip zip \
     libpng-dev libonig-dev libxml2-dev \
     libzip-dev libicu-dev libpq-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
 RUN docker-php-ext-install \
     pdo_pgsql pgsql mbstring exif pcntl \
     bcmath gd zip intl
@@ -63,13 +59,8 @@ RUN chown -R www-data:www-data /var/www/html \
 RUN a2enmod rewrite
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-
-# Only update DocumentRoot safely
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
     /etc/apache2/sites-available/000-default.conf
-
-# ❌ DO NOT modify apache2.conf with sed (this breaks Directory blocks)
-# RUN sed -ri -e 's!Directory /var/www/!Directory ${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 
 EXPOSE 10000
 
