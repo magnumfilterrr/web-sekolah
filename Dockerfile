@@ -4,16 +4,24 @@
 FROM node:20 AS vite-builder
 WORKDIR /app
 
+# Copy package files
 COPY package.json package-lock.json ./
 RUN npm install
 
+# Copy config files
 COPY vite.config.js ./
 COPY postcss.config.js ./
 COPY tailwind.config.js ./
+
+# Copy source files
 COPY resources ./resources
 COPY public ./public
 
-RUN npm run build
+# Build and verify
+RUN npm run build && \
+    echo "=== Build complete, checking files ===" && \
+    ls -la public/build/ && \
+    cat public/build/manifest.json || echo "WARNING: manifest.json not found!"
 
 # =============================
 # 2. BACKEND BUILD (Laravel + Apache)
@@ -36,18 +44,33 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
+# Install PHP dependencies
 COPY composer.json composer.lock ./
 RUN composer install --optimize-autoloader --no-dev --no-scripts \
     || composer install --optimize-autoloader --no-dev --no-scripts --ignore-platform-reqs
 
+# Copy application files
 COPY . .
+
+# Remove node_modules if exists
 RUN rm -rf node_modules
 
-# Copy Vite build output INCLUDING manifest
+# Copy ENTIRE build directory from vite-builder
 COPY --from=vite-builder /app/public/build ./public/build
+
+# Verify manifest exists
+RUN echo "=== Verifying manifest in final image ===" && \
+    ls -la /var/www/html/public/build/ && \
+    if [ ! -f /var/www/html/public/build/manifest.json ]; then \
+        echo "ERROR: manifest.json not found after copy!"; \
+        exit 1; \
+    fi && \
+    echo "SUCCESS: manifest.json found" && \
+    cat /var/www/html/public/build/manifest.json
 
 RUN composer dump-autoload --optimize
 
+# Configure Apache
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
     /etc/apache2/sites-available/000-default.conf && \
@@ -62,11 +85,13 @@ RUN printf "\n<Directory ${APACHE_DOCUMENT_ROOT}>\n\
 
 RUN a2enmod rewrite
 
+# Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache \
     && chmod -R 755 /var/www/html/public
 
+# Configure port
 RUN sed -i "s/Listen 80/Listen 10000/g" /etc/apache2/ports.conf && \
     sed -i "s/:80/:10000/g" /etc/apache2/sites-available/000-default.conf
 
