@@ -7,8 +7,8 @@
     <meta name="description" content="@yield('meta_description', 'Website Resmi SMK')">
     <title>@yield('title', 'Homepage') - {{ $settings['nama_sekolah'] ?? 'SMK' }}</title>
 
-    {{-- Load Tailwind & JS --}}
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- Load Tailwind CDN --}}
+    <script src="https://cdn.tailwindcss.com"></script>
 
     {{-- Font & Animasi --}}
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
