@@ -92,43 +92,33 @@
         </div>
     </div>
 
-    <!-- Mobile Dropdown Menu -->
-    <div x-show="open" x-transition:enter="transition ease-out duration-200"
-        x-transition:enter-start="opacity-0 transform -translate-y-2"
-        x-transition:enter-end="opacity-100 transform translate-y-0"
-        x-transition:leave="transition ease-in duration-150"
-        x-transition:leave-start="opacity-100 transform translate-y-0"
-        x-transition:leave-end="opacity-0 transform -translate-y-2"
-        class="md:hidden bg-white border-t border-gray-100 shadow-lg">
-        <div class="px-4 py-3 space-y-2">
-            <a href="{{ route('home') }}"
-                class="block py-2 text-gray-700 hover:text-blue-600 transition {{ request()->routeIs('home') ? 'text-blue-600 font-semibold' : '' }}">
-                Home
-            </a>
-            <a href="{{ route('profil') }}"
-                class="block py-2 text-gray-700 hover:text-blue-600 transition {{ request()->routeIs('profil') ? 'text-blue-600 font-semibold' : '' }}">
-                Profil
-            </a>
-            <a href="{{ route('jurusan.index') }}"
-                class="block py-2 text-gray-700 hover:text-blue-600 transition {{ request()->routeIs('jurusan.*') ? 'text-blue-600 font-semibold' : '' }}">
-                Jurusan
-            </a>
-            <a href="{{ route('berita.index') }}"
-                class="block py-2 text-gray-700 hover:text-blue-600 transition {{ request()->routeIs('berita.*') ? 'text-blue-600 font-semibold' : '' }}">
-                Berita
-            </a>
-            <a href="{{ route('galeri') }}"
-                class="block py-2 text-gray-700 hover:text-blue-600 transition {{ request()->routeIs('galeri') ? 'text-blue-600 font-semibold' : '' }}">
-                Galeri
-            </a>
+    <!-- Mobile Offcanvas Menu -->
+    <div x-show="open" x-transition:enter="transition transform duration-300"
+        x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
+        x-transition:leave="transition transform duration-300" x-transition:leave-start="translate-x-0"
+        x-transition:leave-end="translate-x-full" x-cloak
+        class="fixed inset-y-0 right-0 w-72 bg-white shadow-xl z-50 md:hidden">
+        <!-- Header -->
+        <div class="flex items-center justify-between px-4 h-16 border-b">
+            <span class="font-bold text-gray-800">Menu</span>
+            <button @click="open = false" class="text-gray-700">
+                ✕
+            </button>
+        </div>
+
+        <!-- Menu -->
+        <div class="px-4 py-4 space-y-3">
+            <a href="{{ route('home') }}" class="block py-2 text-gray-700 hover:text-blue-600">Home</a>
+            <a href="{{ route('profil') }}" class="block py-2 text-gray-700 hover:text-blue-600">Profil</a>
+            <a href="{{ route('jurusan.index') }}" class="block py-2 text-gray-700 hover:text-blue-600">Jurusan</a>
+            <a href="{{ route('berita.index') }}" class="block py-2 text-gray-700 hover:text-blue-600">Berita</a>
+            <a href="{{ route('galeri') }}" class="block py-2 text-gray-700 hover:text-blue-600">Galeri</a>
             <a href="{{ route('kelulusan.index') }}"
-                class="block py-2 text-gray-700 hover:text-blue-600 transition {{ request()->routeIs('kelulusan.*') ? 'text-blue-600 font-semibold' : '' }}">
-                🎓 Cek Kelulusan
+                class="block py-2 text-gray-700 hover:text-blue-600 font-semibold">
+                🎓 Kelulusan
             </a>
-            <a href="{{ route('kontak') }}"
-                class="block py-2 text-gray-700 hover:text-blue-600 transition {{ request()->routeIs('kontak') ? 'text-blue-600 font-semibold' : '' }}">
-                Kontak
-            </a>
+            <a href="{{ route('kontak') }}" class="block py-2 text-gray-700 hover:text-blue-600">Kontak</a>
         </div>
     </div>
+
 </nav>
