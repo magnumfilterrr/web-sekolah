@@ -5,7 +5,7 @@
 @section('content')
     <!-- Hero Section dengan kondisi warna berbeda -->
     <section
-        class="mt-16 py-20 {{ $kelulusan->isLulusLunas() ? 'bg-gradient-to-r from-green-600 to-green-800' : 'bg-gradient-to-r from-red-600 to-red-800' }} text-white">
+        class="mt-16 py-20 {{ $kelulusan->isLulusLunas() ? 'bg-gradient-to-r from-blue-600 to-blue-800' : 'bg-gradient-to-r from-red-600 to-red-800' }} text-white">
         <div class="max-w-screen-xl mx-auto px-4">
             <div class="text-center" data-aos="fade-up">
                 <div class="mb-6">
@@ -77,19 +77,19 @@
 
             <!-- KONDISI 1: LULUS + LUNAS -->
             @if ($kelulusan->isLulusLunas())
-                <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-500 rounded-xl shadow-lg p-8"
+                <div class="bg-gradient-to-br from-blue-50 to-emerald-50 border-2 border-blue-500 rounded-xl shadow-lg p-8"
                     data-aos="fade-up" data-aos-delay="100">
                     <div class="text-center mb-6">
-                        <div class="inline-flex items-center justify-center w-16 h-16 bg-green-500 rounded-full mb-4">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-500 rounded-full mb-4">
                             <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
                                 </path>
                             </svg>
                         </div>
-                        <h3 class="text-3xl font-bold text-green-800 mb-2">
+                        <h3 class="text-3xl font-bold text-blue-800 mb-2">
                             🎉 Selamat Atas Kelulusan Anda!
                         </h3>
-                        <p class="text-green-700 text-lg">
+                        <p class="text-black-700 text-lg">
                             Administrasi pembayaran telah lunas
                         </p>
                     </div>

@@ -3,8 +3,10 @@
 @section('title', 'Cek Kelulusan')
 
 @section('content')
+
+
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-green-600 to-green-800 text-white py-20">
+    <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
         <div class="max-w-screen-xl mx-auto px-4">
             <div class="text-center" data-aos="fade-up">
                 <div class="mb-6">
@@ -96,7 +98,7 @@
                         </div>
 
                         <button type="submit"
-                            class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">

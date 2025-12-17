@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Kelulusan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Setting;
 
 class KelulusanController extends Controller
 {
@@ -13,7 +14,8 @@ class KelulusanController extends Controller
      */
     public function index()
     {
-        return view('frontend.kelulusan.index');
+        $settings = Setting::pluck('value', 'key');
+        return view('frontend.kelulusan.index', compact('settings'));
     }
 
     /**
@@ -43,7 +45,8 @@ class KelulusanController extends Controller
         }
 
         // Redirect ke halaman hasil
-        return view('frontend.kelulusan.hasil', [
+        $settings = Setting::pluck('value', 'key');
+        return view('frontend.kelulusan.hasil', compact('settings'), [
             'kelulusan' => $kelulusan
         ]);
     }
